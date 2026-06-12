@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}IC Simulator – {{ deal.project_name }}{% endblock %}
+
+{% block content %}
+<div class="ic-room">
+    <h1>🧠 INVESTMENT COMMITTEE: {{ deal.project_name }}</h1>
+    <p>You are presenting to the IC. Answer the MD’s, PE Partner’s, and Credit Committee’s questions.</p>
+
+    <div class="ic-question-box" id="question-container">
+        <h3 id="question-text">Click "Start IC Grilling"</h3>
+        <input type="text" id="answer-input" placeholder="Your answer..." disabled>
+        <button id="submit-answer" class="btn" disabled>Submit</button>
+        <div id="feedback"></div>
+    </div>
+
+    <div class="ic-progress">
+        <span id="progress-text">Questions remaining: {{ questions|length }}</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const questions = [
+        {% for q in questions %}
+        { id: {{ q.id }}, question: "{{ q.question|escape }}", answer: "{{ q.answer|escape }}" },
+        {% endfor %}
+    ];
+    let currentIndex = 0;
+    const questionEl = document.getElementById('question-text');
+    const answerInput = document.getElementById('answer-input');
+    const submitBtn = document.getElementById('submit-answer');
+    const feedbackEl = document.getElementById('feedback');
+    const progressText = document.getElementById('progress-text');
+
+    function loadQuestion() {
+        if (currentIndex < questions.length) {
+            questionEl.innerText = questions[currentIndex].question;
+            answerInput.disabled = false;
+            submitBtn.disabled = false;
+            answerInput.value = '';
+            feedbackEl.innerHTML = '';
+            progressText.innerText = `Question ${currentIndex+1} of ${questions.length}`;
+        } else {
+            questionEl.innerText = '🎉 IC GRIND COMPLETE. You survived. Maybe your bonus will survive too.';
+            answerInput.style.display = 'none';
+            submitBtn.style.display = 'none';
+            progressText.innerText = 'Finished';
+        }
+    }
+
+    submitBtn.addEventListener('click', async () => {
+        const answer = answerInput.value;
+        const q = questions[currentIndex];
+        const res = await fetch('/ic/api/answer', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ question_id: q.id, answer: answer })
+        });
+        const data = await res.json();
+        feedbackEl.innerHTML = data.message;
+        if (data.correct) {
+            currentIndex++;
+            setTimeout(loadQuestion, 1000);
+        } else {
+            feedbackEl.innerHTML += ' <br> Try again.';
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (questions.length > 0) {
+            loadQuestion();
+        } else {
+            questionEl.innerText = 'No questions loaded. Seed the database first.';
+        }
+    });
+</script>
+{% endblock %}

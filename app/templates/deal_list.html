@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Deal Room{% endblock %}
+
+{% block content %}
+<div class="deal-list">
+    <h1>📁 DEAL ROOM</h1>
+    <div class="kpi-grid">
+        {% for deal in deals %}
+        <div class="kpi-card">
+            <div class="card-header">{{ deal.project_name }}</div>
+            <div class="card-body">
+                <p>{{ deal.acquirer }} / {{ deal.target }}</p>
+                <p>${{ "{:,.0f}M".format(deal.deal_value) }} | {{ deal.status }}</p>
+                <a href="{{ url_for('deals.deal_detail', deal_id=deal.id) }}" class="btn">Open Deal →</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Live Deal Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <div class="header">
+        <h1>LIVE DEAL DASHBOARD <span class="blink">█</span></h1>
+        <div class="stats-bar">
+            <span>Active Deals: {{ deals|length }}</span>
+            <span>Sponsor Heat: <span class="amber">HIGH</span></span>
+        </div>
+    </div>
+
+    <div class="kpi-grid">
+        {% for deal in deals %}
+        <div class="kpi-card">
+            <div class="card-header">{{ deal.project_name }}</div>
+            <div class="card-body">
+                <div><strong>Acquirer:</strong> {{ deal.acquirer }}</div>
+                <div><strong>Target:</strong> {{ deal.target }}</div>
+                <div><strong>Value:</strong> ${{ "{:,.0f}M".format(deal.deal_value) }}</div>
+                <div><strong>Status:</strong> <span class="status-{{ deal.status.lower() }}">{{ deal.status }}</span></div>
+                <div class="card-footer">
+                    <a href="{{ url_for('deals.deal_detail', deal_id=deal.id) }}" class="btn">View Deal →</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="commentary-feed">
+        <h2>📡 BANKER COMMENTARY</h2>
+        <div class="comment-box">
+            {% for deal in deals %}
+            <div class="comment-item">
+                <span class="time">{{ deal.created_at.strftime('%H:%M') }}</span>
+                <strong>{{ deal.project_name }}</strong>: {{ deal.commentary | safe }}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Virtual Data Room{% endblock %}
+
+{% block content %}
+<div class="data-room">
+    <h1>🔒 VIRTUAL DATA ROOM</h1>
+    <p class="warn">Access Restricted – For Authorized Bidders Only</p>
+    <div class="vdr-grid">
+        {% for section in sections %}
+        <div class="vdr-folder">
+            <h3>📁 {{ section.name }}</h3>
+            <ul>
+                {% for file in section.files %}
+                <li>📄 {{ file }} <span class="lock">🔒</span></li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

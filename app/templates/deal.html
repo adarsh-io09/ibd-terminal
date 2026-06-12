@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}{{ deal.project_name }} Analysis{% endblock %}
+
+{% block content %}
+<div class="deal-room">
+    <h1>{{ deal.project_name }} <span class="status-{{ deal.status.lower() }}">{{ deal.status }}</span></h1>
+    <div class="deal-meta">
+        <span>Acquirer: {{ deal.acquirer }}</span> | 
+        <span>Target: {{ deal.target }}</span> |
+        <span>Deal Value: ${{ "{:,.0f}M".format(deal.deal_value) }}</span> |
+        <span>Premium: {{ deal.premium_pct }}%</span> |
+        <span>Funding: {{ deal.cash_pct }}% Cash / {{ deal.stock_pct }}% Stock / {{ deal.debt_pct }}% Debt</span>
+    </div>
+
+    {% if error %}
+    <div class="error-box" style="background:#330000; border:1px solid #ff3333; padding:15px; margin:20px 0;">
+        <h3 style="color:#ff3333;">⚠️ Data Feed Temporarily Unavailable</h3>
+        <p>{{ error }}. Using static sample data instead. Refresh later for live market data.</p>
+    </div>
+    {% endif %}
+
+    {% if football %}
+    <div class="chart-container">
+        <h2>🏈 FOOTBALL FIELD</h2>
+        <div id="football-chart"></div>
+    </div>
+    {% endif %}
+
+    {% if acc_dil %}
+    <div class="analysis-grid">
+        <div class="metric-box">
+            <h3>ACCRETION / DILUTION</h3>
+            <div class="kpi">
+                <span class="label">Acquirer EPS</span>
+                <span class="value">${{ acc_dil.acq_eps }}</span>
+            </div>
+            <div class="kpi">
+                <span class="label">Pro‑Forma EPS</span>
+                <span class="value">${{ acc_dil.pf_eps }}</span>
+            </div>
+            <div class="kpi big {% if acc_dil.acc_dil_pct > 0 %}green{% else %}red{% endif %}">
+                <span class="label">Acc/Dil</span>
+                <span class="value">{{ acc_dil.acc_dil_pct }}%</span>
+            </div>
+            <p class="verdict">
+                {% if acc_dil.acc_dil_pct > 0 %}Mildly accretive – street may like it.
+                {% elif acc_dil.acc_dil_pct > -1 %}Breakeven-ish. No fireworks.
+                {% else %}Existing shareholders getting smoked. Dilution alert.{% endif %}
+            </p>
+        </div>
+
+        <div class="sensitivity-box">
+            <h3>SENSITIVITY TABLE (Acc/Dil %)</h3>
+            <table class="sens-table">
+                <tr>
+                    <th>Premium \ Cash %</th>
+                    {% for c in acc_dil.cash_pcts %}<th>{{ c }}%</th>{% endfor %}
+                </tr>
+                {% for i in range(acc_dil.premiums|length) %}
+                <tr>
+                    <td>{{ acc_dil.premiums[i] }}%</td>
+                    {% for j in range(acc_dil.cash_pcts|length) %}
+                    <td class="{% if acc_dil.sensitivity[i][j] > 0 %}green{% else %}red{% endif %}">{{ acc_dil.sensitivity[i][j] }}%</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if realism %}
+    <div class="synergy-meter">
+        <h3>🧪 SYNERGY REALISM METER</h3>
+        <div class="meter-bar">
+            <div class="meter-fill" style="width: {{ realism.score }}%; background: {% if realism.score >= 70 %}#00ff88{% elif realism.score >= 40 %}#ffaa00{% else %}#ff3333{% endif %};"></div>
+        </div>
+        <span class="meter-label">{{ realism.level }} ({{ realism.score }}/100)</span>
+        <p class="commentary">{{ realism.comment }}</p>
+    </div>
+    {% endif %}
+
+    {% if risk %}
+    <div class="risk-analyzer">
+        <h3>⚠️ DEAL RISK ANALYZER</h3>
+        <div class="risk-score">
+            <span class="big-number">{{ risk.risk_score }}</span>/100
+            <span class="risk-category">{{ risk.category }}</span>
+        </div>
+        <p>{{ risk.comment }}</p>
+        <div class="risk-radar" id="risk-radar"></div>
+    </div>
+    {% endif %}
+
+    <div class="timeline">
+        <h3>📅 DEAL PROCESS TIMELINE</h3>
+        <div class="timeline-steps">
+            <div class="step done">Teaser</div>
+            <div class="step done">NDA</div>
+            <div class="step active">CIM out</div>
+            <div class="step">IOI due</div>
+            <div class="step">DD</div>
+            <div class="step">Financing</div>
+            <div class="step">Sign</div>
+            <div class="step">Close</div>
+        </div>
+        <p class="commentary">Data room abhi incomplete hai – Legal ne phir markup bhej diya.</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    {% if football %}
+    var ffData = [{
+        type: 'bar',
+        x: [{{ football['52-Week'][0] }}, {{ football['52-Week'][1] }}],
+        y: ['52-Week', '52-Week'],
+        orientation: 'h',
+        marker: {color: '#00d4ff'},
+        width: 0.4
+    }, {
+        type: 'bar',
+        x: [{{ football['DCF'][0] }}, {{ football['DCF'][1] }}],
+        y: ['DCF', 'DCF'],
+        orientation: 'h',
+        marker: {color: '#ffaa00'},
+        width: 0.4
+    }, {
+        type: 'bar',
+        x: [{{ football['Comps'][0] }}, {{ football['Comps'][1] }}],
+        y: ['Comps', 'Comps'],
+        orientation: 'h',
+        marker: {color: '#00ff88'},
+        width: 0.4
+    }];
+    Plotly.newPlot('football-chart', ffData, {
+        barmode: 'overlay',
+        plot_bgcolor: '#0f1216',
+        paper_bgcolor: '#0f1216',
+        font: {color: '#e0e0e0'},
+        height: 250,
+        margin: {l:100, r:20, t:20, b:20}
+    });
+    {% endif %}
+
+    {% if risk %}
+    var riskCtx = document.getElementById('risk-radar').getContext('2d');
+    new Chart(riskCtx, {
+        type: 'radar',
+        data: {
+            labels: ['Integration', 'Leverage', 'Antitrust', 'Cultural'],
+            datasets: [{
+                label: 'Risk',
+                data: [{{ risk.risk_score * 0.4 }}, {{ risk.risk_score * 0.3 }}, {{ risk.risk_score * 0.2 }}, {{ risk.risk_score * 0.1 }}],
+                backgroundColor: 'rgba(255, 51, 51, 0.2)',
+                borderColor: '#ff3333',
+                pointBackgroundColor: '#ff3333'
+            }]
+        },
+        options: { scale: { ticks: { beginAtZero: true, max: 100 } } }
+    });
+    {% endif %}
+</script>
+{% endblock %}

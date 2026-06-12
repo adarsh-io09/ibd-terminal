@@ -1,0 +1,225 @@
+/* Base terminal look */
+:root {
+    --bg-primary: #0a0c10;
+    --bg-secondary: #0f1216;
+    --border-color: #1f2937;
+    --text-primary: #d1d5db;
+    --text-bright: #ffffff;
+    --accent-cyan: #00d4ff;
+    --accent-green: #00ff88;
+    --accent-red: #ff3333;
+    --accent-amber: #ffaa00;
+    --font-mono: 'Courier New', Courier, monospace;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.terminal-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 220px;
+    background-color: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 1.8rem;
+    color: var(--accent-cyan);
+    text-align: center;
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+
+.sidebar ul {
+    list-style: none;
+    margin-top: 30px;
+}
+
+.sidebar ul li a {
+    display: block;
+    padding: 10px 20px;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.sidebar ul li a:hover {
+    background-color: #1e2632;
+    color: var(--accent-cyan);
+}
+
+.sidebar-footer {
+    padding: 20px;
+    font-size: 0.8rem;
+}
+
+.user .green { color: var(--accent-green); }
+
+/* Main content */
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background-color: var(--bg-primary);
+}
+
+/* Live Ticker */
+.ticker-wrap {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    margin-bottom: 20px;
+    height: 30px;
+    position: relative;
+}
+.ticker {
+    display: flex;
+    animation: ticker-scroll 20s linear infinite;
+    white-space: nowrap;
+}
+.ticker-item {
+    padding: 0 30px;
+    color: var(--accent-amber);
+    font-size: 0.85rem;
+}
+@keyframes ticker-scroll {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+/* KPI Grid */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+.kpi-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 15px;
+}
+.kpi-card .card-header {
+    color: var(--accent-cyan);
+    font-weight: bold;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+.kpi-card .card-footer { margin-top: 10px; }
+
+.status-closed { color: var(--accent-green); }
+.status-pending { color: var(--accent-amber); }
+.status-rumored { color: var(--accent-red); }
+
+.btn {
+    background: transparent;
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    padding: 5px 10px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    transition: 0.2s;
+}
+.btn:hover { background: var(--accent-cyan); color: black; }
+
+/* Chart containers */
+.chart-container {
+    margin: 25px 0;
+}
+
+/* Sensitivity table */
+.sens-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+.sens-table th, .sens-table td {
+    border: 1px solid var(--border-color);
+    padding: 5px;
+    text-align: center;
+}
+.sens-table th { background: #161b22; }
+.green { color: var(--accent-green); }
+.red { color: var(--accent-red); }
+
+/* Synergy meter */
+.synergy-meter {
+    margin: 25px 0;
+}
+.meter-bar {
+    background: #2d2d2d;
+    height: 20px;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.meter-fill {
+    height: 100%;
+    width: 0;
+    transition: width 1s;
+}
+
+/* Risk radar */
+.risk-radar { max-width: 300px; margin: 20px auto; }
+
+/* Timeline */
+.timeline-steps {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+.step {
+    padding: 8px 12px;
+    background: #1e2632;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+.step.done { border-color: var(--accent-green); color: var(--accent-green); }
+.step.active { border-color: var(--accent-cyan); color: var(--accent-cyan); animation: pulse 1.5s infinite; }
+
+@keyframes pulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+/* Banker Humor Panel */
+.humor-panel {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: #1a1a1a;
+    border: 1px solid var(--accent-amber);
+    padding: 10px 15px;
+    font-size: 0.7rem;
+    color: var(--accent-amber);
+    max-width: 200px;
+    z-index: 999;
+}
+.humor-title { font-weight: bold; margin-bottom: 4px; }
+
+.blink { animation: blinker 1s step-start infinite; }
+@keyframes blinker { 50% { opacity: 0; } }

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IBD Terminal | {% block title %}M&A Simulator{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="terminal-container">
+        <nav class="sidebar">
+            <div class="logo">IBD<span class="blink">_</span></div>
+            <ul>
+                <li><a href="{{ url_for('dashboard.index') }}">🏦 Dashboard</a></li>
+                <li><a href="{{ url_for('deals.deal_list') }}">📁 Deal Room</a></li>
+                <li><a href="{{ url_for('ic.ic_select') }}">🧠 IC Simulator</a></li>
+                <li><a href="{{ url_for('data_room.index') }}">🔒 Data Room</a></li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="user">Analyst <span class="green">ONLINE</span></div>
+                <div class="time" id="live-time"></div>
+            </div>
+        </nav>
+        <main class="content">
+            <div class="ticker-wrap">
+                <div class="ticker">
+                    {% for log in logs %}
+                    <div class="ticker-item">{{ log.message }}</div>
+                    {% endfor %}
+                    {% if not logs %}
+                    <div class="ticker-item">🔥 DEAL ALERT: Project Titanium – JPM / FinTech – Bid getting spicy</div>
+                    <div class="ticker-item">💬 Sponsor-backed angle lag raha hai on Griffin.</div>
+                    <div class="ticker-item">🚨 Data room abhi incomplete hai – mgmt pushing for early close.</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <div class="humor-panel" id="humor-panel">
+        <div class="humor-title">BANKER MOOD</div>
+        <div id="humor-quote">Associate hasn’t slept in 48 hours.</div>
+    </div>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

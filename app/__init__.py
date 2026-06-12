@@ -17,7 +17,9 @@ def create_app(config_class=Config):
     app.register_blueprint(ic_bp, url_prefix='/ic')
     app.register_blueprint(data_room_bp, url_prefix='/vdr')
 
-    with app.app_context():
+        with app.app_context():
         db.create_all()
+        from app.seed import auto_seed
+        auto_seed()
 
     return app
